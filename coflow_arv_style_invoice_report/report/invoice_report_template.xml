@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+     <record id="paperformat_report_ava_style_invoice" model="report.paperformat">
+        <field name="name">Custom Paperformat for the AVA</field>
+        <field name="default" eval="False"/>
+        <field name="disable_shrinking" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">40</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_ava_style_invoice" model="ir.actions.report">
+        <field name="name">AVA Style Invoices</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coflow_arv_style_invoice_report.ava_style_invoice_template</field>
+        <field name="report_file">coflow_arv_style_invoice_report.ava_style_invoice_template</field>
+        <field name="print_report_name">'Invoice - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_report_ava_style_invoice"/>
+    </record>
+
+    <template id="ava_style_invoice_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: Arial, sans-serif; font-size: 10pt; color: #000;">
+                    <div class="header" style="padding: 0 40px; padding-bottom: 20px;">
+                        <div class="row">
+                            <div class="col-3">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 100px;" alt="Company Logo"/>
+                            </div>
+                            <div class="col-4">
+                                <strong><span t-field="o.company_id.name"/></strong><br/>
+                                <div t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}' style="line-height: 1.2;"/><br/>
+                                <strong>Internetadres:</strong> <span t-field="o.company_id.website"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Email</strong><br/>
+                                <span t-field="o.company_id.email"/><br/><br/>
+                                <strong>Bedrijfsgegevens</strong><br/><br/>
+                                <span t-field="o.company_id.company_registry"/><br/>
+                                <span t-field="o.company_id.vat"/><br/><br/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Telefoon</strong><br/>
+                                <span t-field="o.company_id.phone"/><br/><br/>
+                                <strong>Bankgegevens</strong><br/><br/>
+                                <t t-foreach="o.company_id.bank_ids" t-as="bank">
+                                    <span t-field="bank.acc_number"/> BIC: <span t-field="bank.bank_id.bic"/><br/>
+                                </t>
+                            </div>
+
+                            <!-- <div class="col-7">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 80px;" alt="Company Logo"/>
+                                <br/>
+                                <div class="col-5 text-right">
+                                    <h1 style="font-size: 32pt; font-weight: bold; margin: 0;">Factuur</h1>
+                                </div>
+                            </div> -->
+                        </div><br/>
+                        <div class="row">
+                            <div class="col-3">
+                                <h1 style="font-size: 32pt; font-weight: bold; margin: 0;">Factuur</h1>
+                            </div>
+                            <div class="col-4"/>
+                            <div class="col-3">
+                                <strong>Factuuradres</strong>
+                            </div>
+                            <div class="addr-box col-3">
+                                <t t-esc="o.partner_id.name"/><br/>
+                                <t t-esc="o.partner_id.street or ''"/><br/>
+                                <t t-esc="o.partner_id.zip or ''"/> <t t-esc="o.partner_id.city or ''"/><br/>
+                                <t t-if="o.partner_id.country_id"><t t-esc="o.partner_id.country_id.name"/><br/></t>
+                            </div>
+                        </div><br/><br/><br/><br/>
+                        <div class="row">
+                            <div class="col-3"/>
+                            <div class="col-4"/>
+                            <div class="col-3">
+                                <strong>Afleveradres</strong>
+                            </div>
+                            <div class="addr-box col-3">
+                                <t t-if="docs.partner_shipping_id">
+                                    <t t-esc="docs.partner_shipping_id.name"/><br/>
+                                    <t t-esc="docs.partner_shipping_id.street or ''"/><br/>
+                                    <t t-esc="docs.partner_shipping_id.zip or ''"/> <t t-esc="docs.partner_shipping_id.city or ''"/><br/>
+                                    <t t-if="docs.partner_shipping_id.country_id"><t t-esc="docs.partner_shipping_id.country_id.name"/><br/></t>
+                                </t>
+                                <t t-if="not docs.partner_shipping_id">
+                                    <t t-esc="docs.partner_id.name"/><br/>
+                                    <t t-esc="docs.partner_id.street or ''"/><br/>
+                                    <t t-esc="docs.partner_id.zip or ''"/> <t t-esc="docs.partner_id.city or ''"/><br/>
+                                </t>
+                            </div>
+                        </div><br/><br/>
+                        <div class="row">
+                            <div class="col-2">
+                                <span class="label">Factuurnummer</span><br/><t t-esc="o.name"/>
+                            </div>
+                            <div class="col-2">
+                                <span class="label">Ordernummer</span><br/><t t-esc="o.invoice_origin or ''"/>
+                            </div>
+                            <div class="col-2">
+                                <span class="label">Vervaldatum</span><br/><t t-esc="o.invoice_date_due or o.invoice_date or ''"/>
+                            </div>
+                            <div class="col-2">
+                                <span class="label">Factuurdatum</span><br/><t t-esc="o.invoice_date or o.date or ''"/>
+                            </div>
+                        </div><br/><br/>
+                        <table class="table table-sm" style="font-size: 9.5pt;">
+                             <thead style="background-color: #808080; color: white;">
+                                <tr>
+                                    <th class="text-left" style="border: none; padding: 5px; font-weight: normal;">Artikelcode</th>
+                                    <th class="text-left" style="border: none; padding: 5px; width: 38%; font-weight: normal;">Omschrijving</th>
+                                    <th class="text-right" style="border: none; padding: 5px; font-weight: normal;">Aantal</th>
+                                    <th class="text-left" style="border: none; padding: 5px; padding-left: 10px; font-weight: normal;">Eenheid</th>
+                                    <th class="text-right" style="border: none; padding: 5px; font-weight: normal;">Prijs/stuk</th>
+                                    <th class="text-right" style="border: none; padding: 5px; font-weight: normal;">BTW %</th>
+                                    <th class="text-right" style="border: none; padding: 5px; font-weight: normal;">Factuurprijs</th>
+                                </tr>
+                            </thead>
+                            <tbody class="invoice_tbody">
+                                <t t-foreach="o.invoice_line_ids" t-as="line">
+                                    <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''" style="background-color: lightgrey;">
+                                        <td style="border-style: hidden; padding: 5px 0;"><span t-field="line.product_id.default_code"/></td>
+                                        <td style="border-style: hidden; padding: 5px 0;"><span t-field="line.name"/></td>
+                                        <td class="text-right" style="border-style: hidden; padding: 5px 0;"><span t-field="line.quantity"/></td>
+                                        <td style="border-style: hidden; padding: 5px 0; padding-left: 10px;">
+                                            <!-- <span t-field="line.product_uom_id.name"/> -->
+                                        </td>
+                                        <td class="text-right" style="border-style: hidden; padding: 5px 0;"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        <td class="text-right" style="border-style: hidden; padding: 5px 0;"><span t-esc="', '.join(map(str, [int(tax.amount) for tax in line.tax_ids]))"/></td>
+                                        <td class="text-right" style="border-style: hidden; padding: 5px 0;"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                </t>
+                                <tr style="border-style: hidden;">
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;">Subtotaal excl. BTW</td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"><span t-esc="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/></td>
+                                </tr>
+                                <tr style="border-style: hidden;">
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;">BTW 21%</td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"><span t-esc="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/></td>
+                                </tr>
+                                <tr style="border-style: hidden;">
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;">Totaal incl. BTW</td>
+                                    <td style="border-style: hidden;"></td>
+                                    <td style="border-style: hidden;"><span t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- <div class="row">
+                            <div class="col-2"/>
+                            <div class="col-2"/>
+                            <div class="col-1"/>
+                            <div class="col-1"/>
+                            <div class="col-3">
+                                Subtotaal excl. BTW
+                            </div>
+                            <div class="col-3">
+                                <span t-esc="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2"/>
+                            <div class="col-2"/>
+                            <div class="col-1"/>
+                            <div class="col-1"/>
+                            <div class="col-3 text-right">
+                                BTW 21%
+                            </div>
+                            <div class="col-3">
+                                <span t-esc="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2"/>
+                            <div class="col-2"/>
+                            <div class="col-1"/>
+                            <div class="col-1"/>
+                            <div class="col-3">
+                                Totaal incl. BTW
+                            </div>
+                            <div class="col-3">
+                                <span t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="right-align" style="border: none;">
+                            <table style="border: none; padding: 5px 0;">
+                                <tr style="border: none; padding: 5px 0;">
+                                    <td style="border: none; padding: 5px 0;">Subtotaal excl. BTW</td>
+                                    <td class="right-align" style="border: none; padding: 5px 0;">€ <t t-esc="('{:,.2f}'.format(docs.amount_untaxed))"/></td>
+                                </tr>
+                                <tr style="border: none; padding: 5px 0;">
+                                    <td style="border: none; padding: 5px 0;">BTW 21%</td>
+                                    <td class="right-align" style="border: none; padding: 5px 0;">€ <t t-esc="('{:,.2f}'.format(docs.amount_tax))"/></td>
+                                </tr>
+                                <tr class="total" style="border: none; padding: 5px 0;">
+                                    <td class="total" style="border: none; padding: 5px 0;">Totaal incl. BTW</td>
+                                    <td class="right-align total" style="border: none; padding: 5px 0;">€ <t t-esc="('{:,.2f}'.format(docs.amount_total))"/></td>
+                                </tr>
+                            </table>
+                        </div> -->
+                    </div>
+                    <div class="footer">
+                        <div style="margin-top:10px;">
+                            Op al onze leveringen zijn naast de voorwaarden vermeld op deze factuur, te allen tijde tevens van toepassing onze algemene voorwaarden en
+                            leveringsvoorwaarden zoals gedeponeerd bij de KvK en beschikbaar via onze website. Deze zijn bindend en maken integraal onderdeel uit van
+                            de overeenkomst. Bij te late betaling geldt een krediettoeslag van 2% per maand.
+                        </div><br/><br/>
+                        <div class="row">
+                             <div class="col-6">
+                                Arv Supply Solutions B.V. is houder van de kwaliteitscertificaten ISO 9001 en ISO 14001.
+                                Daarnaast is NaturaSterk een officieel geregistreerd merk van onze onderneming.
+                             </div>
+                             <div class="col-6" style="text-align: end;">
+                                <img t-att-src="'/coflow_arv_style_invoice_report/static/src/img/IMG_9108.JPG'" style="max-height: 60px;"/>
+                                <img t-att-src="'/coflow_arv_style_invoice_report/static/src/img/IMG_9109.PNG'" style="max-height: 60px;"/>
+                                <img t-att-src="'/coflow_arv_style_invoice_report/static/src/img/qr_code.png'" style="max-height: 80px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+   <template id="ava_invoice_template" t-name="ava_style_invoice.ava_invoice_template">
+        <t t-call="web.html_container">
+            <main role="main">
+                <div class="page">
+                    <!-- Styles -->
+                    <style>
+                        @page { size: A4; margin: 20mm }
+                        body { font-family: 'Helvetica', Arial, sans-serif; font-size: 12px; color: #121212; }
+                        .ava-header { text-align: center; padding: 12px 0 6px 0; }
+                        .ava-title { font-size: 34px; font-weight:700; margin:0; color:#121212; }
+                        .ava-sub { font-size:14px; color:#714B67; margin-top:6px; }
+                        .top-blocks { display:flex; justify-content:space-between; margin-top:12px; }
+                        .left, .right { width:48%; }
+                        .company-block { font-size:12px; }
+                        .meta { text-align:right; font-size:13px; }
+                        .meta .label { font-weight:700; }
+                        .addresses { display:flex; gap:30px; margin-top:14px; }
+                        .addr-box { width:48%; }
+                        table.items { width:100%; border-collapse: collapse; margin-top:14px; font-size:12px; }
+                        table.items thead th { border-bottom: 1px solid #ddd; padding:8px; text-align:left; }
+                        table.items tbody td { padding:8px; border-bottom: 1px dotted #e5e5e5; vertical-align:top; }
+                        .right-align { text-align:right; }
+                        .summary { margin-top:12px; width:40%; float:right; font-size:13px; }
+                        .summary table { width:100%; }
+                        .summary td { padding:6px; }
+                        .summary .total { font-weight:700; font-size:16px; }
+                        .footer { clear:both; margin-top:30px; font-size:11px; color:#222; }
+                        .small { font-size:11px; }
+                        /* Ensure page break behaviour for long invoices */
+                        .page { page-break-after: always; }
+                    </style>
+
+                    <!-- Header -->
+                    <div class="ava-header">
+                        <h1 class="ava-title">Factuur</h1>
+                    </div>
+
+                    <!-- Company (left) and Invoice meta (right) -->
+                    <div class="top-blocks">
+                        <div class="left company-block">
+                            <strong><t t-esc="docs.company_id.name"/></strong><br/>
+                            <t t-if="docs.company_id.street"><t t-esc="docs.company_id.street"/><br/></t>
+                            <t t-if="docs.company_id.zip or docs.company_id.city"><t t-esc="docs.company_id.zip or ''"/> <t t-esc="docs.company_id.city or ''"/><br/></t>
+                            <t t-if="docs.company_id.country_id"><t t-esc="docs.company_id.country_id.name"/><br/></t>
+
+                            <div class="small" style="margin-top:8px;">
+                                <t t-if="docs.company_id.website">Internetadres: <t t-esc="docs.company_id.website"/><br/></t>
+                                <t t-if="docs.company_id.email">E-mail: <t t-esc="docs.company_id.email"/><br/></t>
+                                <t t-if="docs.company_id.phone">Telefoon: <t t-esc="docs.company_id.phone"/></t>
+                            </div>
+                        </div>
+
+                        <div class="right meta">
+                            <div><span class="label">Factuurnummer</span><br/><t t-esc="docs.name"/></div>
+                            <div style="margin-top:8px;"><span class="label">Ordernummer</span><br/><t t-esc="docs.invoice_origin or ''"/></div>
+                            <div style="margin-top:8px;"><span class="label">Vervaldatum</span><br/><t t-esc="docs.invoice_date_due or docs.invoice_date or ''"/></div>
+                            <div style="margin-top:8px;"><span class="label">Factuurdatum</span><br/><t t-esc="docs.invoice_date or docs.date or ''"/></div>
+                        </div>
+                    </div>
+
+                    <!-- Addresses -->
+                    <div class="addresses">
+                        <div class="addr-box">
+                            <strong>Afleveradres</strong><br/>
+                            <t t-if="docs.partner_shipping_id">
+                                <t t-esc="docs.partner_shipping_id.name"/><br/>
+                                <t t-esc="docs.partner_shipping_id.street or ''"/><br/>
+                                <t t-esc="docs.partner_shipping_id.zip or ''"/> <t t-esc="docs.partner_shipping_id.city or ''"/><br/>
+                                <t t-if="docs.partner_shipping_id.country_id"><t t-esc="docs.partner_shipping_id.country_id.name"/><br/></t>
+                            </t>
+                            <t t-if="not docs.partner_shipping_id">
+                                <t t-esc="docs.partner_id.name"/><br/>
+                                <t t-esc="docs.partner_id.street or ''"/><br/>
+                                <t t-esc="docs.partner_id.zip or ''"/> <t t-esc="docs.partner_id.city or ''"/><br/>
+                            </t>
+                        </div>
+                        <div class="addr-box">
+                            <strong>Factuuradres</strong><br/>
+                            <t t-esc="docs.partner_id.name"/><br/>
+                            <t t-esc="docs.partner_id.street or ''"/><br/>
+                            <t t-esc="docs.partner_id.zip or ''"/> <t t-esc="docs.partner_id.city or ''"/><br/>
+                            <t t-if="docs.partner_id.country_id"><t t-esc="docs.partner_id.country_id.name"/><br/></t>
+                        </div>
+                    </div>
+
+                    <!-- Items table -->
+                    <table class="items">
+                        <thead>
+                            <tr>
+                                <th>Artikelcode</th>
+                                <th>Omschrijving</th>
+                                <th>Aantal</th>
+                                <th>Eenheid</th>
+                                <th class="right-align">Prijs/stuk</th>
+                                <th class="right-align">BTW %</th>
+                                <th class="right-align">Factuurprijs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs.line_ids" t-as="l">
+                                <tr>
+                                    <td><t t-esc="l.product_id.default_code or ''"/></td>
+                                    <td><t t-esc="l.name"/></td>
+                                    <td><t t-esc="('{:,.2f}'.format(l.quantity))"/></td>
+                                    <td></td>
+                                    <!-- <td><t t-esc="l.uom_id.name or ''"/></td> -->
+                                    <td class="right-align">€ <t t-esc="('{:,.2f}'.format(l.price_unit))"/></td>
+                                    <td class="right-align"><t t-if="l.tax_ids"><t t-esc="','.join([str(int(t.amount)) for t in l.tax_ids])"/> </t><t t-else="">0</t></td>
+                                    <td class="right-align">€ <t t-esc="('{:,.2f}'.format(l.price_subtotal))"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Summary on the right -->
+                    <div class="summary">
+                        <table>
+                            <tr>
+                                <td>Subtotaal excl. BTW</td>
+                                <td class="right-align">€ <t t-esc="('{:,.2f}'.format(docs.amount_untaxed))"/></td>
+                            </tr>
+                            <tr>
+                                <td>BTW 21%</td>
+                                <td class="right-align">€ <t t-esc="('{:,.2f}'.format(docs.amount_tax))"/></td>
+                            </tr>
+                            <tr class="total">
+                                <td class="total">Totaal incl. BTW</td>
+                                <td class="right-align total">€ <t t-esc="('{:,.2f}'.format(docs.amount_total))"/></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Footer content -->
+                    <div class="footer">
+                        <div class="small">
+                            <t t-if="docs.company_id.vat">Bedrijfsgegevens: <t t-esc="docs.company_id.vat"/></t><br/>
+                            <t t-if="docs.company_id.company_registry">Kvk: <t t-esc="docs.company_id.company_registry"/></t><br/>
+                            <t t-if="docs.company_id.bank_ids and docs.company_id.bank_ids[0]">Bankgegevens: <t t-esc="docs.company_id.bank_ids[0].acc_number or docs.company_id.bank_ids[0].acc_number"/></t><br/>
+                            <t t-if="docs.company_id.phone">Telefoon: <t t-esc="docs.company_id.phone"/></t>
+                        </div>
+                        <div style="margin-top:8px;">
+                            Op al onze leveringen zijn naast de voorwaarden vermeld op deze factuur, te allen tijde tevens van toepassing onze algemene voorwaarden en
+                            leveringsvoorwaarden zoals gedeponeerd bij de KvK en beschikbaar via onze website. Deze zijn bindend en maken integraal onderdeel uit van
+                            de overeenkomst. Bij te late betaling geldt een krediettoeslag van 2% per maand.
+                        </div>
+                    </div>
+
+                </div> <!-- .page -->
+            </main>
+        </t>
+    </template>
+</odoo>
