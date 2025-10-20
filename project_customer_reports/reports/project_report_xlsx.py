@@ -117,7 +117,7 @@ class ProjectReportXlsx(models.AbstractModel):
             col += 1
 
             if config.include_allocated_hours:
-                worksheet.write(row, col, task.allocated_hours or 0, number_format)
+                worksheet.write(row, col, task.planned_hours or 0, number_format)
                 col += 1
 
             if config.include_spent_hours:
@@ -147,7 +147,7 @@ class ProjectReportXlsx(models.AbstractModel):
             col += 1
 
             if config.include_allocated_hours:
-                total_allocated = sum(tasks.mapped('allocated_hours'))
+                total_allocated = sum(tasks.mapped('planned_hours'))
                 worksheet.write(row, col, total_allocated, number_format)
                 col += 1
 
