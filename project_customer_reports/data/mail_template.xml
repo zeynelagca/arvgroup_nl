@@ -1,76 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="mail_template_task_report" model="mail.template">
-        <field name="name">Project Task Report</field>
-        <field name="model_id" ref="model_project_report_config"/>
-        <field name="subject">Task Report - ${object.project_id.name or 'Project'}</field>
-        <field name="email_from">${(object.project_id.user_id.email or user.email) or ''|safe}</field>
-        <field name="email_to">${object.email_to or ''}</field>
-        <field name="email_cc">${object.email_cc or ''}</field>
-        <field name="body_html" type="html">
-<![CDATA[
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <div style="background-color: #4472C4; color: white; padding: 20px; text-align: center;">
-        <h2 style="margin: 0;">Project Task Report</h2>
-    </div>
+    <data noupdate="1">
+        <record id="mail_template_task_report" model="mail.template">
+            <field name="name">Project Task Report</field>
+            <field name="model_id" ref="model_project_report_config"/>
+            <field name="subject">Task Report - ${object.project_id.name or 'Project'}</field>
+            <field name="email_from">${(object.project_id.user_id.email or user.email) or ''|safe}</field>
+            <field name="email_to">${object.email_to or ''}</field>
+            <field name="email_cc">${object.email_cc or ''}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background-color: #4472C4; color: white; padding: 20px; text-align: center;">
+                            <h2 style="margin: 0;">Project Task Report</h2>
+                        </div>
+                        <div style="padding: 20px; background-color: #f9f9f9;">
+                            <p>Dear <t t-out="object.partner_id.name or 'Customer'">Customer</t>,</p>
+                            <p>Please find attached the task report for project: <strong><t t-out="object.project_id.name or 'N/A'">Project</t></strong></p>
+                            <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <h3 style="margin-top: 0; color: #4472C4;">Report Details</h3>
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="padding: 5px;"><strong>Project:</strong></td>
+                                        <td style="padding: 5px;"><t t-out="object.project_id.name or 'N/A'">Project Name</t></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px;"><strong>Customer:</strong></td>
+                                        <td style="padding: 5px;"><t t-out="object.partner_id.name or 'N/A'">Customer Name</t></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px;"><strong>Report Date:</strong></td>
+                                        <td style="padding: 5px;"><t t-out="datetime.datetime.now().strftime('%d/%m/%Y')">01/01/2024</t></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p>Best regards,<br/>
+                            <t t-if="user.signature">
+                                <t t-out="user.signature or ''">Signature</t>
+                            </t>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </field>
+        </record>
 
-    <div style="padding: 20px; background-color: #f9f9f9;">
-        <p>Dear ${object.partner_id.name if object.partner_id else 'Customer'},</p>
-
-        <p>Please find attached the task report for project: <strong>${object.project_id.name if object.project_id else 'N/A'}</strong></p>
-
-        <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #4472C4;">Report Details</h3>
-            <table style="width: 100%;">
-                <tr>
-                    <td style="padding: 5px;"><strong>Project:</strong></td>
-                    <td style="padding: 5px;">${object.project_id.name if object.project_id else 'N/A'}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 5px;"><strong>Customer:</strong></td>
-                    <td style="padding: 5px;">${object.partner_id.name if object.partner_id else 'N/A'}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 5px;"><strong>Report Date:</strong></td>
-                    <td style="padding: 5px;">${format_datetime(datetime.datetime.now(), dt_format='dd/MM/yyyy')}</td>
-                </tr>
-            </table>
-        </div>
-
-        <p>Best regards,<br/>
-        <strong>${user.name or ''}</strong><br/>
-        ${user.company_id.name if user.company_id else ''}</p>
-    </div>
-</div>
-]]>
-        </field>
-    </record>
-
-    <record id="mail_template_timesheet_report" model="mail.template">
-        <field name="name">Project Timesheet Report</field>
-        <field name="model_id" ref="model_project_report_config"/>
-        <field name="subject">Timesheet Report - ${object.project_id.name or 'Project'}</field>
-        <field name="email_from">${(object.project_id.user_id.email or user.email) or ''|safe}</field>
-        <field name="email_to">${object.email_to or ''}</field>
-        <field name="email_cc">${object.email_cc or ''}</field>
-        <field name="body_html" type="html">
-<![CDATA[
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <div style="background-color: #28a745; color: white; padding: 20px; text-align: center;">
-        <h2 style="margin: 0;">Weekly Timesheet Report</h2>
-    </div>
-
-    <div style="padding: 20px; background-color: #f9f9f9;">
-        <p>Dear ${object.partner_id.name if object.partner_id else 'Customer'},</p>
-
-        <p>Please find attached the weekly timesheet report for project: <strong>${object.project_id.name if object.project_id else 'N/A'}</strong></p>
-
-        <p>Best regards,<br/>
-        <strong>${user.name or ''}</strong><br/>
-        ${user.company_id.name if user.company_id else ''}</p>
-    </div>
-</div>
-]]>
-        </field>
-    </record>
+        <record id="mail_template_timesheet_report" model="mail.template">
+            <field name="name">Project Timesheet Report</field>
+            <field name="model_id" ref="model_project_report_config"/>
+            <field name="subject">Timesheet Report - ${object.project_id.name or 'Project'}</field>
+            <field name="email_from">${(object.project_id.user_id.email or user.email) or ''|safe}</field>
+            <field name="email_to">${object.email_to or ''}</field>
+            <field name="email_cc">${object.email_cc or ''}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background-color: #28a745; color: white; padding: 20px; text-align: center;">
+                            <h2 style="margin: 0;">Weekly Timesheet Report</h2>
+                        </div>
+                        <div style="padding: 20px; background-color: #f9f9f9;">
+                            <p>Dear <t t-out="object.partner_id.name or 'Customer'">Customer</t>,</p>
+                            <p>Please find attached the weekly timesheet report for project: <strong><t t-out="object.project_id.name or 'N/A'">Project</t></strong></p>
+                            <p>Best regards,<br/>
+                            <t t-if="user.signature">
+                                <t t-out="user.signature or ''">Signature</t>
+                            </t>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </field>
+        </record>
+    </data>
 </odoo>

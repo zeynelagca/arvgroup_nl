@@ -28,7 +28,6 @@
         'views/project_report_config_views.xml',
         'views/send_report_wizard_views.xml',
         'views/project_project_views.xml',
-
     ],
     'external_dependencies': {
         'python': ['xlsxwriter'],

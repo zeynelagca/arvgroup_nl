@@ -102,7 +102,7 @@ class ProjectReportXlsx(models.AbstractModel):
             headers.append('Description')
         headers.append('Stage')
         if config.include_allocated_hours:
-            headers.append('Allocated Hours')
+            headers.append('Planned Hours')
         if config.include_spent_hours:
             headers.append('Hours Spent')
         if config.include_tags:
@@ -134,7 +134,7 @@ class ProjectReportXlsx(models.AbstractModel):
             col += 1
 
             if config.include_allocated_hours:
-                worksheet.write(row, col, task.allocated_hours or 0, number_format)
+                worksheet.write(row, col, task.planned_hours or 0, number_format)
                 col += 1
 
             if config.include_spent_hours:
@@ -154,7 +154,7 @@ class ProjectReportXlsx(models.AbstractModel):
             row += 1
 
         row += 1
-        if config.include_allocated_hours and config.include_spent_hours:
+        if config.include_allocated_hours or config.include_spent_hours:
             col = 0
             worksheet.write(row, col, 'TOTAL', header_format)
 
@@ -164,8 +164,8 @@ class ProjectReportXlsx(models.AbstractModel):
             col += 1
 
             if config.include_allocated_hours:
-                total_allocated = sum(tasks.mapped('allocated_hours'))
-                worksheet.write(row, col, total_allocated, number_format)
+                total_planned = sum(tasks.mapped('planned_hours'))
+                worksheet.write(row, col, total_planned, number_format)
                 col += 1
 
             if config.include_spent_hours:
