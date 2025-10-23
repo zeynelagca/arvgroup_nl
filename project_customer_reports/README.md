@@ -1,4 +1,4 @@
-# Project Customer Reports Module for Odoo 17 CE
+# Project Customer Reports Module for Odoo 16 CE
 
 ## Overview
 
